@@ -17,7 +17,8 @@ import { aiEnabled } from './services/ai.js';
 
 const app = express();
 app.set('trust proxy', true);
-app.use(cors({ origin: config.clientUrl.split(','), credentials: true }));
+// Allow any origin (auth is via Bearer token, not cookies). CLIENT_URL is only used for links in emails.
+app.use(cors({ origin: true }));
 app.use(express.json({ limit: '6mb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, ai: aiEnabled() }));
@@ -33,7 +34,7 @@ app.use((err, _req, res, _next) => {
 });
 
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: config.clientUrl.split(',') } });
+const io = new Server(server, { cors: { origin: true } });
 setIO(io);
 
 io.use((socket, next) => {
